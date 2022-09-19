@@ -1,5 +1,8 @@
 package com.epam.mjc;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class MethodParser {
 
     /**
@@ -20,6 +23,39 @@ public class MethodParser {
      * @return {@link MethodSignature} object filled with parsed values from source string
      */
     public MethodSignature parseFunction(String signatureString) {
-        throw new UnsupportedOperationException("You should implement this method.");
+        List<MethodSignature.Argument> argList = new ArrayList<>();
+        String[] str = signatureString.replaceAll("[\\),]", "").split("\\(");
+
+        if (str.length > 1) {
+            String[] methodArg = str[1].split(" ");
+            for(int i = 0; i < methodArg.length; i += 2) {
+                argList.add(new MethodSignature.Argument(methodArg[i], methodArg[i+1]));
+            }
+            String[] methodSignature = str[0].split(" ");
+            if (methodSignature.length > 2) {
+                MethodSignature ms = new MethodSignature(methodSignature[2], argList);
+                ms.setAccessModifier(methodSignature[0]);
+                ms.setReturnType(methodSignature[1]);
+                return ms;
+            } else if (methodSignature.length <= 2) {
+                MethodSignature ms = new MethodSignature(methodSignature[1], argList);
+                ms.setReturnType(methodSignature[0]);
+                return ms;
+            }
+        }
+        if (str.length == 1) {
+            String[] methodSignature = str[0].split(" ");
+            if (methodSignature.length < 3) {
+                MethodSignature ms = new MethodSignature(methodSignature[1], argList);
+                ms.setReturnType(methodSignature[0]);
+                return ms;
+            } else if (methodSignature.length >= 3) {
+                MethodSignature ms = new MethodSignature(methodSignature[2], argList);
+                ms.setReturnType(methodSignature[1]);
+                ms.setAccessModifier(methodSignature[0]);
+                return ms;
+            }
+        }
+        return null;
     }
 }
